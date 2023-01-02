@@ -89,7 +89,6 @@ public class MainB_07682 {
 		
 		if(p1+p2 == 0) return 0;
 		if(p1+p2 == 1) return 1;
-		if(p1 > 0 && p2 > 0) return -1;
 		if(multiple_train_check(check, (p1!=0)? 1 : 2)) return 1;
 
 		return -1;
