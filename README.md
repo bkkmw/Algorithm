@@ -5,6 +5,7 @@
 
 ## [status]
 [solved]
+[unsolved]
 
 ## [OJ]
 [BOJ]
