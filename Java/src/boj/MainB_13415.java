@@ -45,7 +45,7 @@ public class MainB_13415 {
 	}
 	
 	static int[][] find_valid_sets(int[][] set, int K){
-		int[][] ret = new int[K*2][2];
+		int[][] ret = new int[K*2+1][2];
 		int top = -1;
 		int max = 0;
 		
@@ -67,26 +67,48 @@ public class MainB_13415 {
 			ret[++top][0] = cur;
 			ret[top][1] = i%2;
 		}
-		ret[2*K-1][0] = top;
+		ret[2*K][0] = top;
 		return ret;
 	}
 	
 	static int[] play_sets(int[] seq, int[][] stack, int N, int K) {
-		int top = stack[2*K-1][0];
-		for(int i=0; i<=top; i++) {
-			seq = sort(seq, stack[i][0]+1, stack[i][1]);
+		int top = stack[2*K][0];
+		seq = initial_sort(seq, stack[0][0], stack[0][1]);
+		for(int i=1; i<=top; i++) {
+			if(stack[i][1] != stack[i-1][1]) {
+				seq = reverse_order_(seq, stack[i][0]);
+			}
 		}
 		return seq;
 	}
 	
-	static int[] sort(int[] seq, int dst, int order) {
-		if(order == 0) {
-			Arrays.sort(seq, 0, dst);
+	static int[] initial_sort(int[] seq, int dst, int order) {
+		Arrays.sort(seq, 0, dst+1);
+		if(order == 1) {
+			seq = reverse_order(seq, dst);
 		}
-		else {
-			Integer[] seq_I = Arrays.stream(seq).boxed().toArray(Integer[]::new);
-			Arrays.sort(seq_I, 0, dst, Collections.reverseOrder());
-			seq = Arrays.stream(seq_I).mapToInt(i->i).toArray();
+		return seq;
+	}
+	
+	static int[] reverse_order(int[] seq, int dst) {
+		int len = seq.length;
+		int ret[] = new int[len];
+		
+		for(int i=0; i<=dst; i++) {
+			ret[dst-i] = seq[i];
+		}
+		for(int i=dst+1; i<len; i++) {
+			ret[i] = seq[i];
+		}
+		
+		return ret;
+	}
+	
+	static int[] reverse_order_(int[] seq, int dst) {
+		for(int i=0; i<=dst/2; i++) {
+			int temp = seq[dst-i];
+			seq[dst-i] = seq[i];
+			seq[i] = temp;
 		}
 		return seq;
 	}
