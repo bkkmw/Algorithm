@@ -24,14 +24,18 @@ public class MainB_02954 {
 		for(int i=1; i<L; i++) {
 			prev = input.charAt(i-1);
 			curr = input.charAt(i);
-			output[len++] = curr;`
+			output[len++] = curr;
 			
 			if(input.charAt(i) != 'p') continue;
 			
 			if(prev == 'a' || prev == 'e' || prev == 'i' || prev =='o' || prev == 'u') {
 				if(i == L-1) continue;
 				if(input.charAt(i+1) == prev) {
-					len -=2;
+					len -= 1;
+					i += 2;
+					if(i < L) {
+						output[len++] = input.charAt(i);
+					}
 				}
 			}
 		}
