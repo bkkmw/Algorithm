@@ -1,4 +1,4 @@
-package sol.swea;
+package swea;
 
 import java.util.HashMap;
 import java.util.Scanner;
