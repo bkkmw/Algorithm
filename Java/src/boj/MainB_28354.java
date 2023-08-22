@@ -97,8 +97,11 @@ public class MainB_28354 {
 			
 			for(int i=0; i<edge[src].size(); i++) {
 				int[] temp = edge[src].get(i);
-				if(temp[3] <= t)
+				if(temp[3] <= t) {
+//					edge[src].remove(i);
+//					i--;
 					continue; // expired
+				}
 				int dst = (src == temp[0]) ? temp[1] : temp[0];
 				int time = (temp[2] < t) ? t+1 : temp[2] +1;
 				
@@ -106,6 +109,7 @@ public class MainB_28354 {
 					mature[dst] = time;
 					q.add(new int[] {dst, time});
 				}
+				edge[src].remove(i--);
 			}
 		}
 	}
