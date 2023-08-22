@@ -1,15 +1,20 @@
 # Algorithm
 
-## Commit
-[status] [OJ] problem
+## Commit Rule
+- for initial commit
+  
+`[status] [OJ] problem`
+- for additional commits, first create issue, then
+  
+`[status] #ISSUE_NO comments`
 
 ## [status]
-[solved]
-[unsolved]
+`[solved]`
+`[unsolved]`
 
 ## [OJ]
-[BOJ]
+`[BOJ]` https://www.acmicpc.net/
 
-[SWEA]
+`[SWEA]` https://swexpertacademy.com/
 
-[softeer]
+`[softeer]` https://softeer.ai/
