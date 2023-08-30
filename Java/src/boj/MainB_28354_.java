@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class MainB_28354_ {
@@ -72,57 +74,73 @@ public class MainB_28354_ {
 	
 	public static void solve(int[] mature, List<int[]> connection) {
 		int N = mature.length - 1;
+		int time = 0;
+
+		// dst, start, end
+		List<int[]>[] wait = new LinkedList[N+1];
+		// vertex, time
+		Queue<int[]> modified = new LinkedList<int[]>();
 		
-		List<int[]>[] next = new List[N+1];
-		for(int i=0; i<N+1; i++) 
-			next[i] = new ArrayList<int[]>();
+		for(int i=0; i<N+1; i++) {
+			wait[i] = new LinkedList<int[]>();
+		}
 		
-		connection.forEach((con) -> {
-			if(mature[con[0]] + mature[con[1]] < 2*INF) {
-				// at least one is mature
-				int target = mature[con[0]] < mature[con[1]] ? con[1] : mature[con[0]] == mature[con[1]] ? 0 : con[0];
-				// 5%
-//				if(target == 0) return;
-				if(target > 0) {
-					int src = target == con[0] ? con[1] : con[0];
-					
-					// update status of target
-					int time = mature[src] > con[2] ? mature[src]+1 : con[2]+1;
-					if(time <= con[3] && mature[target] > time)
-						update_status(target, time, mature, next, con[2]);					
+		int size = connection.size();
+		int idx = 0;
+		
+		while(time != INF) {
+			while(idx < size && time == connection.get(idx)[2]) {
+				// add new edges
+				int[] conn = connection.get(idx);
+				
+				if(mature[conn[0]] + mature[conn[1]] >= INF) {
+					// at least one is not
+					add_edge(conn, mature, wait, modified);
 				}
+				// if both are mature, skip
+				idx++;
 			}
-			// 3%
-//			else {
-				// for future usage
-				next[con[0]].add(new int[] {con[1], con[2], con[3]});
-				next[con[1]].add(new int[] {con[0], con[2], con[3]});
-//			}
-		});
+			if(idx < size)
+				time = connection.get(idx)[2];
+			else
+				time = INF;
+			// flush changes
+			while((!modified.isEmpty()) && modified.peek()[1] <= time) {
+				int[] poll = modified.poll();
+				if(mature[poll[0]] < poll[1])
+					continue;
+
+				mature[poll[0]] = poll[1];
+				
+				for(int i=0; i<wait[poll[0]].size(); i++) {
+					int[] edge = wait[poll[0]].get(i);
+					if(edge[2] <= poll[1] || mature[edge[0]] < INF)
+						// expired
+						continue;
+					
+//					int t = (poll[1] > edge[1]) ? poll[1] + 1 : edge[1] + 1;
+					int t = poll[1] + 1;
+					modified.add(new int[] {edge[0], t});
+				}
+				wait[poll[0]].clear();
+			}
+			
+		}
+		
 	}
 	
-	public static void update_status(int target, int t, int[] mature, List<int[]>[] next, int src_t) {
+	public static void add_edge(int[] conn, int[] mature, List<int[]>[] wait, Queue<int[]> modified) {
+		int src = mature[conn[0]] != INF ? conn[0] : conn[1];
+		int dst = src == conn[0] ? conn[1] : conn[0];
 		
-		mature[target] = t;
-		for(int i=0; i<next[target].size(); i++) {
-			int[] temp = next[target].get(i);
-			int time = mature[target] > temp[1] ? mature[target] + 1 : temp[1] +1;
-			
-			if(temp[2] < src_t) {
-				next[target].remove(i--);
-				continue;
-			}
-			
-			if(mature[temp[0]] > time) {
-				// update
-				if(time <= temp[2]) {
-					update_status(temp[0], time, mature, next, src_t);
-				}
-			}
+		if(mature[src] == INF) {
+			// add both
+			wait[src].add(new int[] {dst, conn[2], conn[3]});
+			wait[dst].add(new int[] {src, conn[2], conn[3]});
 		}
-		// 2%
-//		next[target].clear();
-		return;
+		else {
+			modified.add(new int[] {dst, conn[2] + 1});
+		}
 	}
 	
 	public static int[] init_arr(int N) {
