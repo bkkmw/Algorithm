@@ -80,6 +80,7 @@ public class MainB_28354_ {
 		List<int[]>[] wait = new LinkedList[N+1];
 		// vertex, time
 		Queue<int[]> modified = new LinkedList<int[]>();
+		boolean[] tbm = new boolean[N+1];
 		
 		for(int i=0; i<N+1; i++) {
 			wait[i] = new LinkedList<int[]>();
@@ -95,7 +96,7 @@ public class MainB_28354_ {
 				
 				if(mature[conn[0]] + mature[conn[1]] >= INF) {
 					// at least one is not
-					add_edge(conn, mature, wait, modified);
+					add_edge(conn, mature, wait, modified, tbm);
 				}
 				// if both are mature, skip
 				idx++;
@@ -118,9 +119,13 @@ public class MainB_28354_ {
 						// expired
 						continue;
 					
-//					int t = (poll[1] > edge[1]) ? poll[1] + 1 : edge[1] + 1;
-					int t = poll[1] + 1;
-					modified.add(new int[] {edge[0], t});
+					int t = (poll[1] > edge[1]) ? poll[1] + 1 : edge[1] + 1;
+//					int t = poll[1] + 1;
+					if(!tbm[edge[0]]) {
+						modified.add(new int[] {edge[0], t});
+						tbm[edge[0]] = true;
+					}
+					remove_edge(wait[edge[0]], poll[0]);
 				}
 				wait[poll[0]].clear();
 			}
@@ -129,7 +134,17 @@ public class MainB_28354_ {
 		
 	}
 	
-	public static void add_edge(int[] conn, int[] mature, List<int[]>[] wait, Queue<int[]> modified) {
+	public static void remove_edge(List<int[]> wait, int dst) {
+		int size = wait.size();
+		for(int i=0; i<size; i++) {
+			if(wait.get(i)[0] == dst) {
+				wait.remove(i);
+				return;
+			}
+		}
+	}
+	
+	public static void add_edge(int[] conn, int[] mature, List<int[]>[] wait, Queue<int[]> modified, boolean[] tbm) {
 		int src = mature[conn[0]] != INF ? conn[0] : conn[1];
 		int dst = src == conn[0] ? conn[1] : conn[0];
 		
@@ -140,6 +155,7 @@ public class MainB_28354_ {
 		}
 		else {
 			modified.add(new int[] {dst, conn[2] + 1});
+			tbm[dst] = true;
 		}
 	}
 	
