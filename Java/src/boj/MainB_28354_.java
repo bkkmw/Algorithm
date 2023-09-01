@@ -1,11 +1,14 @@
 package boj;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +72,8 @@ public class MainB_28354_ {
 		}
 						
 		solve(mature, conn);
-		print_ans(mature, new StringBuilder());
+//		print_ans(mature, new StringBuilder());
+		print_ans(mature, new BufferedWriter(new OutputStreamWriter(System.out)));
 	}
 	
 	public static void solve(int[] mature, List<int[]> connection) {
@@ -77,13 +81,13 @@ public class MainB_28354_ {
 		int time = 0;
 
 		// dst, start, end
-		List<int[]>[] wait = new LinkedList[N+1];
+		Map<Integer, int[]>[] wait = new HashMap[N+1];
 		// vertex, time
 		Queue<int[]> modified = new LinkedList<int[]>();
 		boolean[] tbm = new boolean[N+1];
 		
 		for(int i=0; i<N+1; i++) {
-			wait[i] = new LinkedList<int[]>();
+			wait[i] = new HashMap<Integer, int[]>();
 		}
 		
 		int size = connection.size();
@@ -113,11 +117,14 @@ public class MainB_28354_ {
 
 				mature[poll[0]] = poll[1];
 				
-				for(int i=0; i<wait[poll[0]].size(); i++) {
-					int[] edge = wait[poll[0]].get(i);
-					if(edge[2] <= poll[1] || mature[edge[0]] < INF)
+				Iterator<Integer> it = wait[poll[0]].keySet().iterator();
+				while(it.hasNext()) {
+					int[] edge = wait[poll[0]].get(it.next());
+					if(edge[2] <= poll[1] || mature[edge[0]] < INF) {
 						// expired
-						continue;
+						remove_edge(wait[edge[0]], poll[0]);
+						continue;						
+					}
 					
 					int t = (poll[1] > edge[1]) ? poll[1] + 1 : edge[1] + 1;
 //					int t = poll[1] + 1;
@@ -134,24 +141,18 @@ public class MainB_28354_ {
 		
 	}
 	
-	public static void remove_edge(List<int[]> wait, int dst) {
-		int size = wait.size();
-		for(int i=0; i<size; i++) {
-			if(wait.get(i)[0] == dst) {
-				wait.remove(i);
-				return;
-			}
-		}
+	public static void remove_edge(Map<Integer, int[]> wait, int dst) {
+		wait.remove(dst);
 	}
 	
-	public static void add_edge(int[] conn, int[] mature, List<int[]>[] wait, Queue<int[]> modified, boolean[] tbm) {
+	public static void add_edge(int[] conn, int[] mature, Map<Integer, int[]>[] wait, Queue<int[]> modified, boolean[] tbm) {
 		int src = mature[conn[0]] != INF ? conn[0] : conn[1];
 		int dst = src == conn[0] ? conn[1] : conn[0];
 		
 		if(mature[src] == INF) {
 			// add both
-			wait[src].add(new int[] {dst, conn[2], conn[3]});
-			wait[dst].add(new int[] {src, conn[2], conn[3]});
+			wait[src].put(dst, new int[] {dst, conn[2], conn[3]});
+			wait[dst].put(src, new int[] {src, conn[2], conn[3]});
 		}
 		else {
 			modified.add(new int[] {dst, conn[2] + 1});
@@ -176,6 +177,16 @@ public class MainB_28354_ {
 		for(int i=1; i<N; i++) {
 			sb.append(mature[i] == INF ? -1 : mature[i]).append(" ");
 		}
-		System.out.println(sb.toString());
+		System.out.println(sb);
+	}
+	
+	public static int print_ans(int[] mature, BufferedWriter bw) throws Exception{
+		int N = mature.length;
+		for(int i=0; i<N; i++) {
+			bw.write((mature[i] == INF ? -1 : mature[i]) + " ");
+		}
+		bw.flush();
+		bw.close();
+		return 0;
 	}
 }
