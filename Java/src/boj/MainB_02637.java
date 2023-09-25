@@ -14,7 +14,8 @@ public class MainB_02637 {
 		int N = Integer.parseInt(br.readLine());
 		int M = Integer.parseInt(br.readLine());
 		
-		List<int[]>[] materials = init_lists(N);
+		List<int[]>[] nexts = init_lists(N);
+		int[] order = new int[N];
 		
 		for(int i=0; i<M; i++) {
 			st = new StringTokenizer(br.readLine(), " ");
@@ -22,56 +23,51 @@ public class MainB_02637 {
 			int y = Integer.parseInt(st.nextToken())-1;
 			int k = Integer.parseInt(st.nextToken());
 			
-			materials[x].add(new int[] {y, k});
+			nexts[y].add(new int[] {x, k});
+			order[x] ++;
 		}
 		
-		int[] ans = solve(N, materials);
+		int[] ans = solve(N, nexts, order);
 		print_ans(ans, sb);
 		System.out.println(sb.toString());
 	}
 	
-	public static int[] solve(int N, List<int[]>[] materials) {
+	public static int[] solve(int N, List<int[]>[] nexts, int[] order) {
 		List<int[]> ans = new LinkedList<int[]>();
-		List<int[]>[] mem = init_lists(N);
-		int[] ret = new int[N];
+		int[][] mem = new int[N][N];
 		
-		ans = find_req(N, materials, mem, N-1, 1);
+		Queue<Integer> q = new LinkedList<Integer>();
 		
-		Iterator<int[]> it = ans.iterator();
-		while(it.hasNext()) {
-			int[] material = it.next();
-			ret[material[0]] += material[1];
+		for(int i=0; i<N; i++) {
+			if(order[i] == 0) { 
+				q.add(i);
+				mem[i][i] = 1;
+			}
 		}
-		return ret;
+		
+		while(!q.isEmpty()) {
+			int node = q.poll();
+			Iterator<int[]> it = nexts[node].iterator();
+			
+			while(it.hasNext()) {
+				int[] next = it.next();
+				copy_req(mem, node, next[0], next[1]);
+				order[next[0]] --;
+				
+				if(order[next[0]] == 0) {
+					q.add(next[0]);
+				}
+			}
+		}
+		
+		return mem[N-1];
 	}
-
-	public static List<int[]> find_req(int N, List<int[]>[] materials, List<int[]>[] mem, int idx, int cnt) {
-		List<int[]> ret = new LinkedList<int[]>();
-		int size = materials[idx].size();
-		if(size < 1) {
-			ret.add(new int[] {idx, cnt});
-			return ret;
+	
+	public static void copy_req(int[][] mem, int src, int dst, int amount) {
+		int N = mem.length;
+		for(int i=0; i<N; i++) {
+			mem[dst][i] += mem[src][i]*amount;
 		}
-		if(mem[idx].size() > 0) {
-			for(int i=0; i<mem[idx].size(); i++) {
-				int[] material = mem[idx].get(i);
-				ret.add(new int[] {material[0], material[1]*cnt});
-			}
-			return ret;
-		}
-		List<int[]> temp;
-		for(int i=0; i<size; i++) {
-			int[] material = materials[idx].get(i);
-			temp = find_req(N, materials, mem, material[0], material[1]);
-			
-			for(int j=0; j<temp.size(); j++) {
-				int[] mat = temp.get(j);
-				mem[idx].add(mat);
-				ret.add(new int[] {mat[0], mat[1]*cnt});
-			}
-			
-		}
-		return ret;
 	}
 	
 	public static void print_ans(int[] ans, StringBuilder sb) {
