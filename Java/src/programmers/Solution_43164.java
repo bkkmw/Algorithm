@@ -2,7 +2,7 @@ package programmers;
 
 import java.util.*;
 
-class Solution {
+class Solution_43164 {
     Map<String, Integer> map;
     List<Integer>[] lists;
     
