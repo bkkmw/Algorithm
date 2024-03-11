@@ -33,6 +33,7 @@ public class MainB_02812 {
 		boolean[] exclude = new boolean[N];
 		
 		for(int i=0; i<N-1; i++) {
+			if(K==0) break;
 			for(int j=1; j<=K; j++) {
 				if(num[i] < num[i+j]) {
 					exclude[i] = true;
