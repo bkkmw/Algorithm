@@ -31,7 +31,7 @@ public class MainB_22871 {
 		
 		for(int i=1; i<N; i++) {
 			for(int j=0; j<i; j++) {
-				long power = (i-j) * (1 + Math.abs(an[i] - an[j]));
+				long power = ((long)(i-j)) * (1 + Math.abs(an[i] - an[j]));
 				long temp = Math.max(power, mem[j]);
 				if(mem[i] > temp)
 					mem[i]=temp;
