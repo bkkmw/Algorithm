@@ -37,6 +37,8 @@ public class MainB_02836 {
 		long ret = M;
 		int len = client.length;
 		
+		if(len < 1) return M;
+		
 		Arrays.sort(client, (int[] o1, int[] o2) -> o1[0]-o2[0]);
 		
 		int left = client[0][0];
